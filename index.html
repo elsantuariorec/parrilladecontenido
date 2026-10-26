@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Parrilla de Contenidos · El Santuario</title>
+<style>
+  :root{
+    --bg:#0a0a0a;
+    --surface:#111111;
+    --surface2:#1a1a1a;
+    --border:#2a2a2a;
+    --border2:#333;
+    --ivory:#f0ead6;
+    --ivory-dim:#b8b09a;
+    --ivory-muted:#6e6860;
+    --pendiente-color:#c0604a;
+    --entregado-color:#5dcc5d;
+    --entregado-bg:rgba(42,90,42,.22);
+    --radio:10px;
+  }
+
+  *{box-sizing:border-box; margin:0; padding:0;}
+  html,body{min-height:100vh;}
+  body{
+    background:var(--bg);
+    font-family:'Iowan Old Style','Palatino Linotype',Georgia,serif;
+    color:var(--ivory);
+  }
+
+  /* ===== HEADER ===== */
+  header{
+    background:var(--surface);
+    border-bottom:1px solid var(--border);
+    padding:18px 32px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:16px;
+    flex-wrap:wrap;
+    position:sticky;
+    top:0;
+    z-index:50;
+  }
+  .brand-row{display:flex; align-items:center; gap:14px;}
+  .logo-mark{height:28px; width:auto; flex-shrink:0;}
+  .brand-text h1{font-size:1.15rem; font-weight:700; letter-spacing:.01em; color:var(--ivory); line-height:1;}
+  .brand-input{
+    background:transparent; border:none;
+    border-bottom:1px dashed var(--border2);
+    color:var(--ivory-dim); font-family:inherit;
+    font-size:.78rem; font-style:italic;
+    padding:2px 4px; width:200px; margin-top:4px; display:block;
+  }
+  .brand-input:focus{outline:none; border-bottom-color:var(--ivory);}
+
+  /* month picker */
+  .month-wrap{position:relative;}
+  .month-btn{
+    background:var(--surface2); border:1px solid var(--border2);
+    color:var(--ivory); font-family:inherit; font-size:.85rem; font-weight:600;
+    padding:8px 14px; border-radius:8px; cursor:pointer;
+    display:flex; align-items:center; gap:8px;
+  }
+  .month-btn:hover{border-color:var(--ivory-dim);}
+  .chev{transition:transform .15s;}
+  .month-btn.open .chev{transform:rotate(180deg);}
+  .month-pop{
+    position:absolute; top:calc(100% + 8px); right:0;
+    background:var(--surface2); border:1px solid var(--border2);
+    border-radius:12px; padding:10px;
+    display:none; grid-template-columns:repeat(3,84px);
+    gap:6px; z-index:200;
+    box-shadow:0 12px 32px rgba(0,0,0,.6);
+  }
+  .month-pop.show{display:grid;}
+  .month-cell{
+    background:var(--surface); border:1px solid var(--border);
+    border-radius:8px; padding:8px 4px;
+    text-align:center; cursor:pointer;
+    font-size:.74rem; color:var(--ivory-dim); line-height:1.3;
+  }
+  .month-cell:hover{border-color:var(--border2); color:var(--ivory);}
+  .month-cell.active{background:var(--ivory); color:var(--bg); border-color:var(--ivory); font-weight:700;}
+  .month-cell .count{display:block; font-size:.62rem; margin-top:2px; opacity:.65;}
+
+  /* header right */
+  .header-right{display:flex; align-items:center; gap:10px; flex-wrap:wrap;}
+  .btn{
+    border:1px solid var(--border2); border-radius:999px;
+    padding:7px 16px; font-family:inherit; font-size:.78rem; font-weight:600;
+    cursor:pointer; background:transparent; color:var(--ivory);
+    transition:background .15s, border-color .15s;
+  }
+  .btn:hover{background:var(--surface2); border-color:var(--ivory-dim);}
+  .btn-primary{background:var(--ivory); color:var(--bg); border-color:var(--ivory);}
+  .btn-primary:hover{background:var(--ivory-dim);}
+  .readonly-badge{
+    background:var(--surface2); border:1px solid var(--border2);
+    border-radius:999px; padding:5px 12px;
+    font-size:.72rem; color:var(--ivory-muted);
+    display:flex; align-items:center; gap:6px;
+  }
+  .readonly-badge .dot{width:6px;height:6px;border-radius:50%;background:#555;}
+
+  /* ===== MAIN ===== */
+  main{max-width:1100px; margin:0 auto; padding:28px 32px 80px;}
+
+  .mes-titulo{
+    font-size:1rem; font-weight:700; color:var(--ivory-dim);
+    margin-bottom:18px; display:flex; align-items:center; gap:10px;
+  }
+  .mes-label-input{
+    background:transparent; border:none;
+    border-bottom:1px dashed var(--border2);
+    color:var(--ivory); font-family:inherit;
+    font-size:1rem; font-weight:700; padding:2px 0; width:180px;
+  }
+  .mes-label-input:focus{outline:none; border-bottom-color:var(--ivory);}
+
+  /* ===== FICHAS ===== */
+  .cards-list{display:flex; flex-direction:column; gap:7px;}
+
+  .card{
+    background:var(--surface); border:1px solid var(--border);
+    border-radius:var(--radio); overflow:hidden;
+    transition:border-color .15s;
+  }
+  .card:hover{border-color:var(--border2);}
+  .card.is-entregado .card-row{opacity:.55;}
+
+  /* fila principal */
+  .card-row{
+    display:grid;
+    grid-template-columns: 26px 1fr 150px 130px 36px;
+    align-items:center; gap:10px;
+    padding:11px 14px; cursor:pointer; user-select:none;
+  }
+
+  .card-num{
+    font-size:.7rem; font-weight:700; color:var(--ivory-muted); text-align:center;
+  }
+
+  .card-titulo-input{
+    background:transparent; border:none;
+    color:var(--ivory); font-family:inherit;
+    font-size:.88rem; font-weight:600;
+    width:100%; padding:0;
+  }
+  .card-titulo-input:focus{outline:none;}
+  .card-titulo-input::placeholder{color:var(--ivory-muted); font-weight:400; font-style:italic;}
+
+  .card-numcont-wrap{text-align:center;}
+  .card-numcont-label{font-size:.58rem; text-transform:uppercase; letter-spacing:.5px; color:var(--ivory-muted); display:block; margin-bottom:3px;}
+  .card-numcont-input{
+    background:transparent; border:none;
+    border-bottom:1px dashed var(--border);
+    color:var(--ivory-dim); font-family:inherit; font-size:.78rem;
+    text-align:center; width:100%; padding:1px 0;
+  }
+  .card-numcont-input:focus{outline:none; border-bottom-color:var(--ivory);}
+  .card-numcont-input::placeholder{color:var(--ivory-muted);}
+
+  /* status toggle */
+  .status-toggle{
+    display:inline-flex; align-items:center; gap:5px;
+    font-size:.7rem; font-weight:700; letter-spacing:.3px;
+    cursor:pointer; padding:5px 11px; border-radius:999px; border:1px solid;
+    white-space:nowrap; transition:all .2s; background:transparent; font-family:inherit;
+  }
+  .status-toggle.pendiente{color:var(--pendiente-color); border-color:var(--pendiente-color);}
+  .status-toggle.entregado{color:var(--entregado-color); border-color:#2a5a2a; background:var(--entregado-bg);}
+
+  /* expand chevron */
+  .expand-btn{
+    background:none; border:none; color:var(--ivory-muted);
+    cursor:pointer; font-size:.85rem; padding:4px; border-radius:4px;
+    transition:transform .15s, color .15s; line-height:1;
+  }
+  .expand-btn:hover{color:var(--ivory);}
+  .card.expanded .expand-btn{transform:rotate(180deg);}
+
+  /* cuerpo expandido */
+  .card-body{display:none; padding:0 14px 16px; border-top:1px solid var(--border);}
+  .card.expanded .card-body{display:block;}
+  .card-body-inner{
+    display:grid; grid-template-columns:1fr 1fr; gap:16px; padding-top:14px;
+  }
+  .field label{
+    display:block; font-size:.62rem; text-transform:uppercase;
+    letter-spacing:.6px; color:var(--ivory-muted); font-weight:700; margin-bottom:5px;
+  }
+  .field textarea{
+    width:100%; background:var(--surface2); border:1px solid var(--border);
+    border-radius:6px; color:var(--ivory); font-family:inherit; font-size:.84rem;
+    padding:8px 10px; resize:vertical; min-height:72px; line-height:1.5;
+  }
+  .field textarea:focus{outline:none; border-color:var(--border2);}
+  .field textarea::placeholder{color:var(--ivory-muted);}
+
+  .card-actions{
+    display:flex; justify-content:flex-end;
+    padding-top:10px; margin-top:10px; border-top:1px solid var(--border);
+  }
+  .del-btn{
+    background:none; border:none; cursor:pointer;
+    color:var(--ivory-muted); font-size:.72rem; font-family:inherit; padding:4px 8px;
+  }
+  .del-btn:hover{color:#cc4444;}
+
+  /* add card */
+  .add-card-wrap{margin-top:10px;}
+  .btn-add{
+    background:none; border:1px dashed var(--border2);
+    color:var(--ivory-muted); border-radius:8px;
+    padding:9px 18px; font-size:.8rem; cursor:pointer;
+    font-family:inherit; transition:all .15s;
+  }
+  .btn-add:hover{border-color:var(--ivory-dim); color:var(--ivory);}
+
+  /* ===== FOOTER ===== */
+  footer{
+    position:sticky; bottom:0;
+    background:var(--surface); border-top:1px solid var(--border);
+    padding:11px 32px;
+    display:flex; justify-content:space-between; align-items:center;
+    gap:10px; flex-wrap:wrap;
+  }
+  .footer-info{font-size:.7rem; color:var(--ivory-muted);}
+
+  /* toast */
+  .toast{
+    position:fixed; bottom:66px; right:24px;
+    background:var(--surface2); border:1px solid var(--border2);
+    color:var(--ivory); padding:8px 16px; border-radius:8px;
+    font-size:.8rem; opacity:0; transform:translateY(6px);
+    transition:opacity .22s, transform .22s; z-index:999; pointer-events:none;
+  }
+  .toast.show{opacity:1; transform:translateY(0);}
+
+  /* readonly */
+  body.readonly-mode .btn-add,
+  body.readonly-mode .del-btn,
+  body.readonly-mode .add-card-wrap{display:none !important;}
+  body.readonly-mode .card-titulo-input,
+  body.readonly-mode .mes-label-input,
+  body.readonly-mode .brand-input,
+  body.readonly-mode .field textarea,
+  body.readonly-mode .card-numcont-input{pointer-events:none; cursor:default;}
+
+  @media(max-width:700px){
+    header{padding:12px 16px;}
+    main{padding:16px 14px 80px;}
+    footer{padding:9px 16px;}
+    .card-row{grid-template-columns:22px 1fr 90px 32px;}
+    .card-numcont-wrap{display:none;}
+  }
+
+</style>
+</head>
+<body>
+
+<header>
+  <div class="brand-row">
+    <svg class="logo-mark" viewBox="0 0 2307.57 1077.14" xmlns="http://www.w3.org/2000/svg" aria-label="El Santuario">
+      <g fill="#f0ead6">
+        <path d="M970.38,424.6c0-31.96,0-57.41-12.89-70.81-6.45-6.74-16.16-10.44-30.72-10.44-9.79,0-20.67,4.1-31.66,10.44-3.99,2.29-7.98,4.88-11.95,7.7-33.88,23.94-65.41,63.12-65.41,63.12v-48.53h21.8v-21.8h-109.01v.02h-21.8v21.8h21.8v667.28h-21.8v21.8h130.81v-21.8h-21.8V478.38c0-16.13,17.99-61.11,42.99-61.11,17.07,0,21.45,22.37,22.41,46.33.55,13.45,0,27.43,0,38.2v541.57h-21.8v21.8h130.81v-21.8h-21.8V424.6Z"/>
+        <path d="M713.77,918.33v-3.1c0-8.98-7.28-16.22-16.22-16.22h-.15c-9.03.11-16.4-7.19-16.4-16.22v-418.04c0-79.12-56.1-101.08-87.21-107.14-11.95-2.35-20.21-2.35-20.21-2.35,0,0-152.62-21.76-152.62,100.99,0,0,0,57.17,65.84,57.17,49.97,0,66.98-44.93,60.33-73.17-11.51-48.82,5.17-64.1,26.45-64.1.37,0,19.84.07,20.21,27.45v219.72c0-47.73-38.7-86.42-86.42-86.42s-86.4,38.7-86.4,86.42v366.28c0,47.73,38.68,86.42,86.4,86.42,23.85,0,45.48-9.68,61.11-25.31,15.63-15.65,25.31-37.24,25.31-61.11v59.34c0,8.96,7.26,16.22,16.22,16.22h1.77c5.47,0,10.55-2.75,13.56-7.33l85.77-130.6c1.74-2.66,2.66-5.76,2.66-8.92ZM571.99,988.75c0,18.05-14.65,32.7-32.7,32.7s-32.7-14.65-32.7-32.7v-377.16c0-18.07,14.65-32.7,32.7-32.7,9.03,0,17.2,3.66,23.11,9.57,5.93,5.93,9.59,14.08,9.59,23.13v377.16Z"/>
+        <path d="M1116.15,250.12c156.26-45.74,294.94-107.16,408.79-168.52,19.71-10.64,50.36-26.08,73.65-20.28,35.47,8.81,10.2,55.62-1.09,74.22-17.55,28.91-56.66,56.75-60.44,91.11-2.73,24.77,14.91,48.86,37.89,58.5,47.38,19.84,100.49-12.14,135.13-42.86,23,21.91,58.36,26.64,89.35,19.6,30.98-7.02,58.58-24.18,85.09-41.66,26.53-17.46,53.09-35.8,83.26-45.7,41.99-13.8,88.39-10.07,130.25,4.16,41.84,14.22,79.62,38.39,114.72,65.28,12.82,9.83,28.41,20.67,43.74,15.59,10.81-3.6,17.88-14.76,19.25-26.08,1.37-11.29-2.05-22.7-6.8-33.05-24.27-52.85-82.87-84.2-140.89-88.23-58.02-4.03-109.76,2.11-167.29,41.53-156.92,107.53-203.44,112.23-235.27,75.07,46.48-34.84,90.76-79.12,123.64-127.02,5.49-8.02,10.88-16.42,13.1-25.9,2.25-9.46.79-20.34-6-27.34-11.66-12.03-31.87-7.33-46.9.13-63.53,31.53-126.02,112.98-107.01,182.64-2.75,3.95-11.93,8.83-15.85,10.86-13.91,7.22-28.98,12.21-44.46,14.74-12.71,2.07-26.36,2.35-37.83-3.49-16.85-8.59-19.25-25.2-13.76-41.56,9.81-29.17,29.76-48.6,50.58-70.05,24.96-25.73,54.66-61.72,43.21-100.36-6.91-23.37-29.63-39.96-54.09-41.36-30.44-1.72-57.78,24.59-82.3,39.27-65.71,39.31-134.32,73.76-205.05,103.13-49.06,20.36-125.49,48.07-226.66,72.9v-81.42c0-8.61-11.16-12.01-15.98-4.86l-69.77,104c-.29.44-.53.92-.73,1.4-142.34,28.1-589.05,101.24-588,17.96.42-33.39,56.34-60.71,74.7-68.39,124.09-51.92,109.34-116.34,101.93-132.75-10.97-24.31-41.66-31.88-68.31-33.18-140.95-6.98-272.27,76.18-369.05,178.89C92.92,290.38,23.52,405.5,4.03,532.34c-4.82,31.33-6.52,63.75,1.74,94.34,8.26,30.59,27.67,59.28,56.23,72.97,32.49,15.57,72.38,9.46,103.37-8.94,30.96-18.38,54.14-47.53,72.84-78.29,5.97-9.83,11.82-20.17,21.08-26.97,9.24-6.8,23.09-8.96,31.92-1.64,8.35,6.93,9.31,19.16,9.61,30,.55,19.64,2.38,58.91,2.38,58.91v284.43c0,29.54-19.67,54.51-46.61,62.49-5.91,1.79-12.14,2.73-18.62,2.73-3.21,0-6.34-.24-9.44-.68-31.29-4.53-54.33-31.29-55.77-63.71v-77.99h-31.5v184.97h31.5v-21.37c23.11,20.84,53.7,33.53,87.25,33.53,19.34,0,37.72-4.21,54.22-11.77,20.91-9.57,38.85-24.51,52.06-43.06,14.89-20.89,23.76-46.35,24.09-73.89v-275.69c0-66-4.88-97.65-42.41-123.16-24.2-16.44-56.6-16.88-84.44-7.78-27.82,9.09-37.51,34.96-60.98,52.45-50.99,37.99-111.48,34.85-129.68,23.81-32.01-19.43-33.58-64.95-27.69-101.93,23.74-148.82,109.03-286.31,229.93-376.29,46.22-34.4,99.33-62.73,156.76-66.96,29.54-2.18,64.67,5.86,76.11,33.16,9.22,22-1.64,48.25-19.38,64.16-17.75,15.94-41.01,23.94-63.49,31.94-22.48,7.98-45.59,16.83-62.25,33.9-8.24,8.46-13.66,19.48-14.52,31.24-7.64,104.11,492.4,48.34,680.58,2.59v773.49h-21.8v21.8h130.81v-21.8h-21.8V250.12Z"/>
+        <path d="M1415.83,898.01h-.15c-9.03.11-16.37-7.19-16.37-16.22v-505.73h21.8v-21.8h-130.81v21.8h21.8v565.01c0,16.11-18.01,61.11-42.99,61.11-17.05,0-21.45-22.33-22.41-46.26V376.06h21.8v-21.8h-130.81v21.8h21.8v618.77c0,31.98,0,57.41,12.89,70.81,6.45,6.74,16.16,10.44,30.72,10.44,9.79,0,20.67-4.1,31.66-10.44,3.99-2.29,7.98-4.88,11.95-7.72,33.88-23.92,65.41-63.1,65.41-63.1v53.11c0,8.96,7.26,16.22,16.22,16.22h1.77c5.45,0,10.55-2.75,13.56-7.33l85.77-130.6c1.72-2.66,2.66-5.76,2.66-8.92v-3.1c0-8.96-7.28-16.22-16.24-16.22Z"/>
+        <path d="M1742.34,918.33v-3.1c0-8.98-7.28-16.22-16.22-16.22h-.15c-9.03.11-16.4-7.19-16.4-16.22v-418.04c0-79.12-56.1-101.08-87.21-107.14-11.95-2.35-20.21-2.35-20.21-2.35,0,0-152.62-21.76-152.62,100.99,0,0,0,57.17,65.84,57.17,49.97,0,66.98-44.93,60.33-73.17-11.51-48.82,5.17-64.1,26.45-64.1.37,0,19.84.07,20.21,27.45v219.72c0-47.73-38.7-86.42-86.42-86.42s-86.4,38.7-86.4,86.42v366.23c0,47.73,38.68,86.42,86.4,86.42,23.85,0,45.48-9.68,61.11-25.31,15.63-15.65,25.31-37.24,25.31-61.11v59.4c0,8.96,7.26,16.22,16.22,16.22h1.77c5.47,0,10.55-2.75,13.56-7.33l85.77-130.6c1.74-2.66,2.66-5.76,2.66-8.92ZM1600.56,988.75c0,18.05-14.65,32.7-32.7,32.7s-32.7-14.65-32.7-32.7v-377.16c0-18.07,14.65-32.7,32.7-32.7,9.03,0,17.2,3.66,23.11,9.57,5.93,5.93,9.59,14.08,9.59,23.13v377.16Z"/>
+        <polygon points="1888.95 649.7 1910.76 649.7 1910.76 1043.37 1888.95 1043.37 1888.95 1065.17 2019.77 1065.17 2019.77 1043.37 1997.97 1043.37 1997.97 649.7 2019.77 649.7 2019.77 627.9 1888.95 627.9 1888.95 649.7"/>
+        <path d="M1954.36,343.34c-57.49,0-110.27,77.42-110.27,77.42v-44.69h21.8v-21.8h-130.81v21.8h21.8v667.31h-21.8v21.8h130.81v-21.8h-21.8V472.26c9.8-26.38,27.01-52.37,48.16-70.86,15.74-13.76,38.15-26.33,59.82-25.49,27.88,1.09,36.24,32.73,30.29,55.53-10.05,38.5-62.5,26.4-83.32,57.01-21.14,31.07-6.47,79.67,29.02,92.76,32.22,11.88,66.82-6.65,86.38-32.33,4.92-6.46,9.26-13.82,12.97-21.83,31.66-68.35,17.5-183.71-73.05-183.7Z"/>
+        <path d="M2272.44,378.46c-21.69-21.72-51.65-35.12-84.77-35.12-66.24,0-119.91,53.68-119.91,119.89v492.97c0,66.21,53.68,119.89,119.91,119.89s119.89-53.68,119.89-119.89v-492.97c0-33.1-13.43-63.07-35.12-84.77ZM2220.57,989.02c0,17.94-14.54,32.49-32.49,32.49s-32.51-14.54-32.51-32.49V408.57c0-17.94,14.56-32.51,32.51-32.51,8.98,0,17.09,3.64,22.98,9.53,5.86,5.89,9.51,14.02,9.51,22.98v580.45Z"/>
+      </g>
+    </svg>
+    <div class="brand-text">
+      <h1>Parrilla de Contenidos</h1>
+      <input class="brand-input" id="brandName" type="text" placeholder="Marca / sello">
+    </div>
+  </div>
+
+  <div class="header-right">
+    <div id="readonlyBadge" class="readonly-badge" style="display:none">
+      <span class="dot"></span> Solo lectura
+    </div>
+    <div class="month-wrap" id="monthWrap">
+      <button class="month-btn" id="monthBtn">
+        <span id="monthLabel">—</span>
+        <svg class="chev" width="12" height="7" viewBox="0 0 12 7" fill="none">
+          <path d="M1 1l5 5 5-5" stroke="#f0ead6" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+      </button>
+      <div class="month-pop" id="monthPop"></div>
+    </div>
+    <button class="btn btn-primary" id="btnCompartir">⬡ Compartir mes</button>
+  </div>
+</header>
+
+<main id="mainContent"></main>
+
+<footer id="mainFooter">
+  <div class="footer-info">Datos guardados automáticamente en este navegador.</div>
+</footer>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ========== CONSTANTES ========== */
+const MES_NOMBRES = ["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"];
+const STORAGE_KEY = "parrilla_v3";
+const DEFAULT_CARDS = 8;
+
+/* ========== MODO READONLY ========== */
+const urlParams = new URLSearchParams(location.search);
+const IS_READONLY = urlParams.has('ver');
+
+/* ========== ESTADO ========== */
+function cid(){ return 'c'+Math.random().toString(36).slice(2,9); }
+
+function makeCard(num){
+  return { id:cid(), titulo:"", numContenido: num ? String(num) : "", descripcion:"", formato:"", estado:"pendiente" };
+}
+
+function defaultState(){
+  return {
+    brand:"",
+    activeMonth: new Date().getMonth(),
+    months: MES_NOMBRES.map((label,i)=>({
+      label, monthIndex:i,
+      cards: Array.from({length:DEFAULT_CARDS}, (_,i)=> makeCard(i+1))
+    }))
+  };
+}
+
+let state;
+
+if(IS_READONLY){
+  try{
+    const payload = JSON.parse(decodeURIComponent(escape(atob(urlParams.get('ver')))));
+    // Construir state mínimo con solo el mes compartido
+    state = defaultState();
+    state.brand = payload.brand || "";
+    state.activeMonth = payload.mesIndex || 0;
+    if(payload.cards){
+      state.months[state.activeMonth].cards = payload.cards;
+      state.months[state.activeMonth].label = payload.mesLabel || state.months[state.activeMonth].label;
+    }
+  }catch(e){ state = defaultState(); }
+  document.body.classList.add('readonly-mode');
+  document.getElementById('readonlyBadge').style.display = 'flex';
+  document.getElementById('btnCompartir').style.display = 'none';
+  document.getElementById('monthWrap').style.display = 'none';
+  document.getElementById('mainFooter').style.display = 'none';
+  document.getElementById('brandName').setAttribute('readonly','');
+} else {
+  try{
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if(raw){
+      state = JSON.parse(raw);
+      // garantizar ids
+      state.months.forEach(m=> m.cards.forEach(c=>{ if(!c.id) c.id=cid(); }));
+    } else { state = defaultState(); }
+  }catch(e){ state = defaultState(); }
+  document.getElementById('btnCompartir').addEventListener('click', compartir);
+}
+
+if(typeof state.activeMonth !== 'number') state.activeMonth = 0;
+
+function save(){
+  if(IS_READONLY) return;
+  try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }catch(e){}
+}
+
+/* ========== RENDER ========== */
+function render(){
+  document.getElementById('brandName').value = state.brand || "";
+  renderMonthPicker();
+  renderMonth();
+}
+
+function renderMonthPicker(){
+  const active = state.months[state.activeMonth];
+  document.getElementById('monthLabel').textContent = active.label;
+  const pop = document.getElementById('monthPop');
+  pop.innerHTML = "";
+  state.months.forEach((mo,idx)=>{
+    const div = document.createElement('div');
+    div.className = 'month-cell'+(idx===state.activeMonth?' active':'');
+    const ent = mo.cards.filter(c=>c.estado==='entregado').length;
+    div.innerHTML = `${mo.label}<span class="count">${ent}/${mo.cards.length}</span>`;
+    div.addEventListener('click',()=>{
+      state.activeMonth = idx; save(); closePop(); render();
+    });
+    pop.appendChild(div);
+  });
+}
+
+function renderMonth(){
+  const container = document.getElementById('mainContent');
+  container.innerHTML = "";
+  const m = state.months[state.activeMonth];
+
+  // Título del mes (editable)
+  const tWrap = document.createElement('div');
+  tWrap.className = 'mes-titulo';
+  if(IS_READONLY){
+    tWrap.textContent = m.label;
+  } else {
+    const inp = document.createElement('input');
+    inp.className = 'mes-label-input';
+    inp.type = 'text';
+    inp.value = m.label;
+    inp.placeholder = 'Mes';
+    inp.addEventListener('input', e=>{ m.label = e.target.value; save(); renderMonthPicker(); });
+    tWrap.appendChild(inp);
+  }
+  container.appendChild(tWrap);
+
+  // Lista de fichas
+  const list = document.createElement('div');
+  list.className = 'cards-list';
+  m.cards.forEach((card,idx)=> list.appendChild(buildCard(card, m, idx)));
+  container.appendChild(list);
+
+  // Botón agregar
+  if(!IS_READONLY){
+    const addWrap = document.createElement('div');
+    addWrap.className = 'add-card-wrap';
+    const addBtn = document.createElement('button');
+    addBtn.className = 'btn-add';
+    addBtn.textContent = '+ Agregar ficha';
+    addBtn.addEventListener('click',()=>{
+      m.cards.push(makeCard(m.cards.length+1)); save(); renderMonth(); renderMonthPicker();
+      showToast("Ficha agregada");
+    });
+    addWrap.appendChild(addBtn);
+    container.appendChild(addWrap);
+  }
+}
+
+function buildCard(card, m, idx){
+  const wrap = document.createElement('div');
+  wrap.className = 'card'+(card.estado==='entregado'?' is-entregado':'');
+  wrap.dataset.id = card.id;
+
+  const esEnt = card.estado === 'entregado';
+
+  /* ---- fila principal ---- */
+  const row = document.createElement('div');
+  row.className = 'card-row';
+
+  // Número de ficha
+  const numEl = document.createElement('div');
+  numEl.className = 'card-num';
+  numEl.textContent = idx+1;
+
+  // Título
+  const tituloInp = document.createElement('input');
+  tituloInp.className = 'card-titulo-input';
+  tituloInp.type = 'text';
+  tituloInp.value = card.titulo;
+  tituloInp.placeholder = 'Título del contenido';
+  if(IS_READONLY) tituloInp.readOnly = true;
+  tituloInp.addEventListener('input', e=>{
+    const c = m.cards.find(x=>x.id===card.id); if(c){ c.titulo=e.target.value; save(); }
+  });
+
+  // N° contenido
+  const numContWrap = document.createElement('div');
+  numContWrap.className = 'card-numcont-wrap';
+  const numContLabel = document.createElement('span');
+  numContLabel.className = 'card-numcont-label';
+  numContLabel.textContent = 'N° contenido';
+  const numContInp = document.createElement('input');
+  numContInp.className = 'card-numcont-input';
+  numContInp.type = 'text';
+  numContInp.value = card.numContenido;
+  numContInp.placeholder = '—';
+  if(IS_READONLY) numContInp.readOnly = true;
+  numContInp.addEventListener('click', e=> e.stopPropagation());
+  numContInp.addEventListener('input', e=>{
+    const c = m.cards.find(x=>x.id===card.id); if(c){ c.numContenido=e.target.value; save(); }
+  });
+  numContWrap.appendChild(numContLabel);
+  numContWrap.appendChild(numContInp);
+
+  // Toggle estado
+  const toggle = document.createElement('button');
+  toggle.className = 'status-toggle '+(esEnt?'entregado':'pendiente');
+  toggle.textContent = esEnt ? '✓ Entregado' : '○ Pendiente';
+  if(IS_READONLY && esEnt) toggle.disabled = true;
+  toggle.addEventListener('click', e=>{
+    e.stopPropagation();
+    const c = m.cards.find(x=>x.id===card.id); if(!c) return;
+    if(IS_READONLY){
+      if(c.estado !== 'entregado'){
+        c.estado = 'entregado';
+        renderMonth(); renderMonthPicker();
+        showToast("Marcado como entregado ✓");
+      }
+    } else {
+      c.estado = c.estado==='entregado' ? 'pendiente' : 'entregado';
+      save(); renderMonth(); renderMonthPicker();
+    }
+  });
+
+  // Chevron expandir
+  const expBtn = document.createElement('button');
+  expBtn.className = 'expand-btn';
+  expBtn.innerHTML = '▾';
+  expBtn.title = 'Ver detalles';
+  expBtn.addEventListener('click', e=>{
+    e.stopPropagation(); wrap.classList.toggle('expanded');
+  });
+
+  row.appendChild(numEl);
+  row.appendChild(tituloInp);
+  row.appendChild(numContWrap);
+  row.appendChild(toggle);
+  row.appendChild(expBtn);
+
+  // Click en la fila para expandir (excepto inputs/buttons)
+  row.addEventListener('click', e=>{
+    if(e.target.closest('input,button,select,textarea')) return;
+    wrap.classList.toggle('expanded');
+  });
+
+  /* ---- cuerpo expandido ---- */
+  const body = document.createElement('div');
+  body.className = 'card-body';
+
+  const inner = document.createElement('div');
+  inner.className = 'card-body-inner';
+
+  // Descripción
+  const fDesc = document.createElement('div');
+  fDesc.className = 'field';
+  const lblDesc = document.createElement('label');
+  lblDesc.textContent = 'Descripción';
+  const taDesc = document.createElement('textarea');
+  taDesc.placeholder = 'De qué trata este contenido...';
+  taDesc.value = card.descripcion;
+  if(IS_READONLY) taDesc.readOnly = true;
+  taDesc.addEventListener('input', e=>{
+    const c = m.cards.find(x=>x.id===card.id); if(c){ c.descripcion=e.target.value; save(); }
+  });
+  fDesc.appendChild(lblDesc); fDesc.appendChild(taDesc);
+
+  // Formato
+  const fFmt = document.createElement('div');
+  fFmt.className = 'field';
+  const lblFmt = document.createElement('label');
+  lblFmt.textContent = 'Formato';
+  const taFmt = document.createElement('textarea');
+  taFmt.placeholder = 'Reel, carrusel, foto, story...';
+  taFmt.value = card.formato;
+  if(IS_READONLY) taFmt.readOnly = true;
+  taFmt.addEventListener('input', e=>{
+    const c = m.cards.find(x=>x.id===card.id); if(c){ c.formato=e.target.value; save(); }
+  });
+  fFmt.appendChild(lblFmt); fFmt.appendChild(taFmt);
+
+  inner.appendChild(fDesc);
+  inner.appendChild(fFmt);
+  body.appendChild(inner);
+
+  // Eliminar (solo edición)
+  if(!IS_READONLY){
+    const actions = document.createElement('div');
+    actions.className = 'card-actions';
+    const delBtn = document.createElement('button');
+    delBtn.className = 'del-btn';
+    delBtn.textContent = 'Eliminar ficha';
+    delBtn.addEventListener('click', e=>{
+      e.stopPropagation();
+      if(!confirm('¿Eliminar esta ficha?')) return;
+      m.cards = m.cards.filter(x=>x.id!==card.id);
+      save(); renderMonth(); renderMonthPicker();
+      showToast("Ficha eliminada");
+    });
+    actions.appendChild(delBtn);
+    body.appendChild(actions);
+  }
+
+  wrap.appendChild(row);
+  wrap.appendChild(body);
+  return wrap;
+}
+
+/* ========== MONTH PICKER ========== */
+document.getElementById('monthBtn').addEventListener('click', e=>{
+  e.stopPropagation();
+  document.getElementById('monthPop').classList.toggle('show');
+  document.getElementById('monthBtn').classList.toggle('open');
+});
+document.addEventListener('click', e=>{
+  if(!document.getElementById('monthWrap').contains(e.target)) closePop();
+});
+function closePop(){
+  document.getElementById('monthPop').classList.remove('show');
+  document.getElementById('monthBtn').classList.remove('open');
+}
+
+/* ========== BRAND ========== */
+document.getElementById('brandName').addEventListener('input', e=>{
+  state.brand = e.target.value; save();
+});
+
+/* ========== COMPARTIR ========== */
+function compartir(){
+  try{
+    // Solo compartir el mes activo — URL más corta y manejable
+    const m = state.months[state.activeMonth];
+    const payload = {
+      brand: state.brand || "",
+      mesLabel: m.label,
+      mesIndex: state.activeMonth,
+      cards: m.cards
+    };
+    const json = JSON.stringify(payload);
+    const encoded = btoa(unescape(encodeURIComponent(json)));
+    const url = location.origin + location.pathname + '?ver=' + encoded;
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(url)
+        .then(()=> showToast("Link copiado ✓ — " + m.label))
+        .catch(()=> prompt("Copia este link para compartir " + m.label + ":", url));
+    } else {
+      prompt("Copia este link para compartir " + m.label + ":", url);
+    }
+  }catch(e){ showToast("Error al generar el link"); }
+}
+
+/* ========== TOAST ========== */
+let toastTimer;
+function showToast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(()=> t.classList.remove('show'), 2600);
+}
+
+/* ========== INIT ========== */
+render();
+</script>
+</body>
+</html>
