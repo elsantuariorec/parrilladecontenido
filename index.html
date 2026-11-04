@@ -197,6 +197,13 @@
   }
   .field textarea:focus{outline:none; border-color:var(--border2);}
   .field textarea::placeholder{color:var(--ivory-muted);}
+  .field-text{
+    width:100%; background:var(--surface2); border:1px solid var(--border);
+    border-radius:6px; color:var(--ivory); font-family:inherit; font-size:.84rem;
+    padding:8px 10px; line-height:1.5; white-space:pre-wrap; word-break:break-word;
+    min-height:40px;
+  }
+  .field-text.empty{color:var(--ivory-muted); font-style:italic;}
 
   .card-actions{
     display:flex; justify-content:flex-end;
@@ -538,28 +545,40 @@ function buildCard(card, m, idx){
   fDesc.className = 'field';
   const lblDesc = document.createElement('label');
   lblDesc.textContent = 'Descripción';
-  const taDesc = document.createElement('textarea');
-  taDesc.placeholder = 'De qué trata este contenido...';
-  taDesc.value = card.descripcion;
-  if(IS_READONLY) taDesc.readOnly = true;
-  taDesc.addEventListener('input', e=>{
-    const c = m.cards.find(x=>x.id===card.id); if(c){ c.descripcion=e.target.value; save(); }
-  });
-  fDesc.appendChild(lblDesc); fDesc.appendChild(taDesc);
+  if(IS_READONLY){
+    const divDesc = document.createElement('div');
+    divDesc.className = 'field-text' + (card.descripcion ? '' : ' empty');
+    divDesc.textContent = card.descripcion || 'Sin descripción';
+    fDesc.appendChild(lblDesc); fDesc.appendChild(divDesc);
+  } else {
+    const taDesc = document.createElement('textarea');
+    taDesc.placeholder = 'De qué trata este contenido...';
+    taDesc.value = card.descripcion;
+    taDesc.addEventListener('input', e=>{
+      const c = m.cards.find(x=>x.id===card.id); if(c){ c.descripcion=e.target.value; save(); }
+    });
+    fDesc.appendChild(lblDesc); fDesc.appendChild(taDesc);
+  }
 
   // Formato
   const fFmt = document.createElement('div');
   fFmt.className = 'field';
   const lblFmt = document.createElement('label');
   lblFmt.textContent = 'Formato';
-  const taFmt = document.createElement('textarea');
-  taFmt.placeholder = 'Reel, carrusel, foto, story...';
-  taFmt.value = card.formato;
-  if(IS_READONLY) taFmt.readOnly = true;
-  taFmt.addEventListener('input', e=>{
-    const c = m.cards.find(x=>x.id===card.id); if(c){ c.formato=e.target.value; save(); }
-  });
-  fFmt.appendChild(lblFmt); fFmt.appendChild(taFmt);
+  if(IS_READONLY){
+    const divFmt = document.createElement('div');
+    divFmt.className = 'field-text' + (card.formato ? '' : ' empty');
+    divFmt.textContent = card.formato || 'Sin formato';
+    fFmt.appendChild(lblFmt); fFmt.appendChild(divFmt);
+  } else {
+    const taFmt = document.createElement('textarea');
+    taFmt.placeholder = 'Reel, carrusel, foto, story...';
+    taFmt.value = card.formato;
+    taFmt.addEventListener('input', e=>{
+      const c = m.cards.find(x=>x.id===card.id); if(c){ c.formato=e.target.value; save(); }
+    });
+    fFmt.appendChild(lblFmt); fFmt.appendChild(taFmt);
+  }
 
   inner.appendChild(fDesc);
   inner.appendChild(fFmt);
